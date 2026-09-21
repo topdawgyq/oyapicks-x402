@@ -1,0 +1,71 @@
+# OyaPicks
+
+> Cross-venue prediction-market data for AI agents, payable per request over
+> x402. No API key, no signup, no subscription. Pay only for the call you make.
+
+OyaPicks normalizes prediction-market data from Polymarket and Alpha Arcade into
+one shape, so an agent can compare venues without writing per-venue adapters.
+The same pipeline powers a public, independently verifiable prediction track
+record at https://oyapicks.app/track.
+
+## Paid endpoints on Base (USDC via x402)
+
+Use these if your wallet holds USDC on Base. The Algorand list below carries these same ten products plus alpha-book, which is Algorand only.
+
+- [oyapicks-analyze](https://oyapicks.app/api/x402/analyze) — $0.25: Top 3 prediction markets by 24h volume across Polymarket and Alpha Arcade: question, venue, implied probability, 24h USD volume, and resolution date.
+- [oyapicks-arbitrage](https://oyapicks.app/api/x402/arbitrage) — $0.05: Same outcome priced differently on Polymarket and Alpha Arcade: the event, the outcome, each venue's price, the gap in percentage points, and which venue is cheaper.
+- [oyapicks-closing-soon](https://oyapicks.app/api/x402/closing-soon) — $0.02: Prediction markets resolving within 48 hours: question, venue, implied probability, 24h USD volume, and end date.
+- [oyapicks-movers](https://oyapicks.app/api/x402/movers) — $0.03: Prediction markets with the biggest probability swings since the last snapshot: venue, question, previous price, new price, and percentage-point change.
+- [oyapicks-new-markets](https://oyapicks.app/api/x402/new-markets) — $0.03: Prediction markets newly listed since the last snapshot: question, venue, implied probability, 24h USD volume, and resolution date.
+- [oyapicks-probability-history](https://oyapicks.app/api/x402/probability-history) — $0.03: Probability time series for one prediction market. Pass ?q= to select it; returns the matched market, venue, and dated price points in decimal and percent.
+- [oyapicks-resolutions](https://oyapicks.app/api/x402/resolutions) — $0.03: Recently resolved Polymarket prediction markets: question, winning outcome, resolution timestamp, and USD volume.
+- [oyapicks-search](https://oyapicks.app/api/x402/search) — $0.02: Keyword search of live Polymarket and Alpha Arcade prediction markets. Pass ?q= to get matching questions with venue, implied probability, 24h USD volume, and end date.
+- [oyapicks-single-market](https://oyapicks.app/api/x402/single-market) — $0.01: One prediction market by keyword: the single highest-volume live match, with venue, implied probability, 24h USD volume, and end date. Pass ?q=.
+- [oyapicks-volume-spikes](https://oyapicks.app/api/x402/volume-spikes) — $0.03: Prediction markets with the largest 24h trading-volume jumps: venue, question, previous and new 24h volume, the multiple, and percent change.
+
+## Paid endpoints (Algorand Mainnet, USDC via x402)
+
+- [oyapicks-alpha-book](https://oyapicks.app/api/x402/alpha-book) — $0.03: The complete live Alpha Arcade catalog in a single call: every open market with question, end date, 24h USD volume, outcome labels, per-outcome implied probabilities (0-1), categories, market URL, and per-outcome Algorand application IDs. Includes multi-choice markets. Algorand only; there is no Base route for this product.
+- [oyapicks-analyze](https://oyapicks.app/api/x402/analyze-algo) — $0.25: Top 3 prediction markets by 24h volume across Polymarket and Alpha Arcade: question, venue, implied probability, 24h USD volume, and resolution date.
+- [oyapicks-arbitrage](https://oyapicks.app/api/x402/arbitrage-algo) — $0.05: Same outcome priced differently on Polymarket and Alpha Arcade: the event, the outcome, each venue's price, the gap in percentage points, and which venue is cheaper.
+- [oyapicks-closing-soon](https://oyapicks.app/api/x402/closing-soon-algo) — $0.02: Prediction markets resolving within 48 hours: question, venue, implied probability, 24h USD volume, and end date.
+- [oyapicks-movers](https://oyapicks.app/api/x402/movers-algo) — $0.03: Prediction markets with the biggest probability swings since the last snapshot: venue, question, previous price, new price, and percentage-point change.
+- [oyapicks-new-markets](https://oyapicks.app/api/x402/new-markets-algo) — $0.03: Prediction markets newly listed since the last snapshot: question, venue, implied probability, 24h USD volume, and resolution date.
+- [oyapicks-probability-history](https://oyapicks.app/api/x402/probability-history-algo) — $0.03: Probability time series for one prediction market. Pass ?q= to select it; returns the matched market, venue, and dated price points in decimal and percent.
+- [oyapicks-resolutions](https://oyapicks.app/api/x402/resolutions-algo) — $0.03: Recently resolved Polymarket prediction markets: question, winning outcome, resolution timestamp, and USD volume.
+- [oyapicks-search](https://oyapicks.app/api/x402/search-algo) — $0.02: Keyword search of live Polymarket and Alpha Arcade prediction markets. Pass ?q= to get matching questions with venue, implied probability, 24h USD volume, and end date.
+- [oyapicks-single-market](https://oyapicks.app/api/x402/single-market-algo) — $0.01: One prediction market by keyword: the single highest-volume live match, with venue, implied probability, 24h USD volume, and end date. Pass ?q=.
+- [oyapicks-volume-spikes](https://oyapicks.app/api/x402/volume-spikes-algo) — $0.03: Prediction markets with the largest 24h trading-volume jumps: venue, question, previous and new 24h volume, the multiple, and percent change.
+
+## Payment
+
+- Protocol: x402 (HTTP 402 Payment Required)
+- Network: Algorand Mainnet
+- Asset: USDC (ASA 31566704)
+- Facilitator: https://facilitator.goplausible.xyz
+- payTo: NMVLONWVRZUTUSHOVJLPQZTKII4RNCHA33R5HRRWHBCHGMU4BLIKIJAVA4
+
+The same products are also available on Base. The Base endpoints use:
+- Network: Base Mainnet (eip155:8453)
+- Asset: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+- Facilitator: Coinbase CDP
+- payTo: 0x7df9C5eDBf039b1C645d7697F58EfD143f0986E1
+
+## MCP server
+All ten Base endpoints are also available as MCP tools for Claude Desktop, Cursor, and Windsurf.
+Install with: npx -y oyapicks-mcp
+- [npm](https://www.npmjs.com/package/oyapicks-mcp)
+- [source](https://github.com/oyapicks/oyapicks-mcp) — one file, MIT licensed
+
+## OpenAPI
+- [openapi.json](https://oyapicks.app/openapi.json) — machine-readable spec for the Base endpoints
+
+## Pages
+
+- [Track record](https://oyapicks.app/track) — every call logged in public before the outcome
+- [Products](https://oyapicks.app/products) — the data product storefront
+
+## Notes
+
+- Data sourced from Polymarket and Alpha Arcade public market data.
+- Results are public; methodology is not published.

@@ -1,0 +1,102 @@
+{
+  "x402Version": 2,
+  "name": "OyaPicks",
+  "description": "Cross-venue prediction-market data for AI agents, payable per request over x402. Normalized market data from Polymarket and Alpha Arcade, backed by a public verifiable track record at https://oyapicks.app/track.",
+  "url": "https://oyapicks.app",
+  "documentation": "https://oyapicks.app/products",
+  "tag": "x402-global-challenge",
+  "payment": {
+    "network": "algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=",
+    "networkName": "Algorand Mainnet",
+    "asset": {
+      "assetId": 31566704,
+      "symbol": "USDC",
+      "decimals": 6
+    },
+    "payTo": "NMVLONWVRZUTUSHOVJLPQZTKII4RNCHA33R5HRRWHBCHGMU4BLIKIJAVA4",
+    "facilitator": "https://facilitator.goplausible.xyz",
+    "scheme": "exact"
+  },
+  "resources": [
+    {
+      "name": "oyapicks-analyze",
+      "resource": "https://oyapicks.app/api/x402/analyze-algo",
+      "method": "GET",
+      "price": "$0.25",
+      "description": "Top 3 prediction markets by 24h volume across Polymarket and Alpha Arcade: question, venue, implied probability, 24h USD volume, and resolution date.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-arbitrage",
+      "resource": "https://oyapicks.app/api/x402/arbitrage-algo",
+      "method": "GET",
+      "price": "$0.05",
+      "description": "Same outcome priced differently on Polymarket and Alpha Arcade: the event, the outcome, each venue's price, the gap in percentage points, and which venue is cheaper.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-closing-soon",
+      "resource": "https://oyapicks.app/api/x402/closing-soon-algo",
+      "method": "GET",
+      "price": "$0.02",
+      "description": "Prediction markets resolving within 48 hours: question, venue, implied probability, 24h USD volume, and end date.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-movers",
+      "resource": "https://oyapicks.app/api/x402/movers-algo",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "Prediction markets with the biggest probability swings since the last snapshot: venue, question, previous price, new price, and percentage-point change.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-new-markets",
+      "resource": "https://oyapicks.app/api/x402/new-markets-algo",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "Prediction markets newly listed since the last snapshot: question, venue, implied probability, 24h USD volume, and resolution date.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-probability-history",
+      "resource": "https://oyapicks.app/api/x402/probability-history-algo",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "Probability time series for one prediction market. Pass ?q= to select it; returns the matched market, venue, and dated price points in decimal and percent.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-resolutions",
+      "resource": "https://oyapicks.app/api/x402/resolutions-algo",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "Recently resolved Polymarket prediction markets: question, winning outcome, resolution timestamp, and USD volume.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-search",
+      "resource": "https://oyapicks.app/api/x402/search-algo",
+      "method": "GET",
+      "price": "$0.02",
+      "description": "Keyword search of live Polymarket and Alpha Arcade prediction markets. Pass ?q= to get matching questions with venue, implied probability, 24h USD volume, and end date.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-single-market",
+      "resource": "https://oyapicks.app/api/x402/single-market-algo",
+      "method": "GET",
+      "price": "$0.01",
+      "description": "One prediction market by keyword: the single highest-volume live match, with venue, implied probability, 24h USD volume, and end date. Pass ?q=.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "oyapicks-volume-spikes",
+      "resource": "https://oyapicks.app/api/x402/volume-spikes-algo",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "Prediction markets with the largest 24h trading-volume jumps: venue, question, previous and new 24h volume, the multiple, and percent change.",
+      "mimeType": "application/json"
+    }
+  ]
+}
