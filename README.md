@@ -173,6 +173,8 @@ Things that cost us time, written down so they don't cost you any.
 
 **9. Filter before you cap.** Alpha's live list includes recently ended 5- and 15-minute crypto markets, priced at 0 but still carrying 24h volume. Taking the top 60 by volume first and filtering second let them crowd out up to 45 of the 60 slots. Filter out ended and unpriced markets first, then cap.
 
+**10. Polymarket's `/markets` endpoint returns at most 100 markets per request.** We asked for 600 and got exactly 100. Individual team futures ("Will the Yankees win the 2026 World Series?") never trade enough to reach that top 100, so a scanner that pulls by volume and then looks for tournaments silently finds nothing. `arbitrage.ts` now fetches each tournament's event directly with `/events?slug=...`, which returns every team market in it, and reads Alpha's whole catalog instead of its top 40.
+
 ---
 
 ## Track record
