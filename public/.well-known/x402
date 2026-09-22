@@ -19,6 +19,14 @@
   },
   "resources": [
     {
+      "name": "oyapicks-alpha-book",
+      "resource": "https://oyapicks.app/api/x402/alpha-book",
+      "method": "GET",
+      "price": "$0.03",
+      "description": "The complete live Alpha Arcade catalog in a single call: every open market with question, end date, 24h USD volume, outcome labels, per-outcome implied probabilities (0-1), categories, market URL, and per-outcome Algorand application IDs. Includes multi-choice markets. Sorted by 24h volume descending.",
+      "mimeType": "application/json"
+    },
+    {
       "name": "oyapicks-analyze",
       "resource": "https://oyapicks.app/api/x402/analyze-algo",
       "method": "GET",
