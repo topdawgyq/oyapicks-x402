@@ -4,17 +4,18 @@
 // Algorand MainNet, then print the data and the on-chain settlement ID.
 //
 //   Dry run (free, nothing signed, nothing sent):
-//     node buyer.mjs single-market-algo "world cup"
+//     node buyer.mjs single-market-algo "bitcoin"
 //
 //   Pay for real:
-//     ALGO_MNEMONIC="word1 word2 ... word25" node buyer.mjs single-market-algo "world cup" --pay
+//     ALGO_MNEMONIC="word1 word2 ... word25" node buyer.mjs single-market-algo "bitcoin" --pay
 //
 // Env:
 //   ALGO_MNEMONIC     25-word Algorand mnemonic (or use AVM_PRIVATE_KEY)
 //   AVM_PRIVATE_KEY   base64 64-byte secret key (alternative to the mnemonic)
 //   MAX_USD           refuse to pay more than this per call (default 0.25)
 //   OYAPICKS_BASE     default https://oyapicks.app
-//   ALGOD_URL         your own Algorand node (default: AlgoNode public MainNet)
+//   ALGOD_URL         your own Algorand node (default: AlgoNode, matched to the
+//                     network the server asks for)
 //
 // The paying wallet needs USDC (ASA 31566704) and a little ALGO for fees.
 // Use a throwaway wallet funded with a dollar or two, never your main one.
@@ -22,7 +23,7 @@
 import algosdk from "algosdk";
 import { wrapFetchWithPaymentFromConfig, x402Client, x402HTTPClient } from "@x402-avm/fetch";
 import { ExactAvmScheme } from "@x402-avm/avm/exact/client";
-import { toClientAvmSigner } from "@x402-avm/avm";
+import { toClientAvmSigner, NETWORK_TO_ALGOD } from "@x402-avm/avm";
 
 const USDC_DECIMALS = 6;
 
@@ -57,7 +58,7 @@ if (!product || !PRODUCTS.has(product)) {
     `Usage: node buyer.mjs <product> [query] [--pay]\n\n  Products:\n    ${[...PRODUCTS].join("\n    ")}`,
   );
 }
-if (NEEDS_QUERY.has(product) && !query) die(`${product} needs a keyword, e.g. "world cup"`);
+if (NEEDS_QUERY.has(product) && !query) die(`${product} needs a keyword, e.g. "bitcoin"`);
 
 const base = (process.env.OYAPICKS_BASE ?? "https://oyapicks.app").replace(/\/$/, "");
 const url = `${base}/api/x402/${product}${query ? `?q=${encodeURIComponent(query)}` : ""}`;
@@ -124,19 +125,24 @@ if (!b64Key && process.env.ALGO_MNEMONIC) {
 }
 if (!b64Key) die("Set ALGO_MNEMONIC (or AVM_PRIVATE_KEY) to pay.");
 const signer = toClientAvmSigner(b64Key);
+
+// Pick the Algorand node that matches the network the SERVER asked for.
+// @x402-avm/avm 2.6.1 does not do this itself: with no algodUrl it always
+// builds against TestNet, so a MainNet payment fails verification with
+// "Transaction genesis hash does not match expected network".
+const algodUrl = process.env.ALGOD_URL || NETWORK_TO_ALGOD[req.network];
+if (!algodUrl) die(`No known Algorand node for ${req.network}. Set ALGOD_URL.`);
+
 console.log(`\n  Paying from ${signer.address}`);
+console.log(`  via node   ${algodUrl}`);
 
 // --------------------------------------------------- step 4: pay + fetch ----
 const paidFetch = wrapFetchWithPaymentFromConfig(fetch, {
   schemes: [
     {
       network: "algorand:*",
-      // Pass the node here. The ALGOD_MAINNET_URL env var in the package
-      // README is not read by this client (verified against 2.6.1).
-      client: new ExactAvmScheme(
-        signer,
-        process.env.ALGOD_URL ? { algodUrl: process.env.ALGOD_URL } : undefined,
-      ),
+      // Always pass the node explicitly (see the note above).
+      client: new ExactAvmScheme(signer, { algodUrl }),
     },
   ],
   policies: [underCap],
@@ -157,7 +163,23 @@ const data = await res.json().catch(() => null);
 
 if (!res.ok) {
   // The server only settles on success, so a failed call costs nothing.
-  die(`Call failed with ${res.status}. No payment was settled.\n  ${JSON.stringify(data)}`);
+  // On a rejected payment the reason is in the PAYMENT-REQUIRED header,
+  // not the body.
+  let reason = "";
+  if (res.status === 402) {
+    try {
+      const again = new x402HTTPClient(new x402Client()).getPaymentRequiredResponse(
+        (n) => res.headers.get(n),
+        data ?? undefined,
+      );
+      if (again?.error) reason = `\n  Reason: ${again.error}`;
+    } catch {
+      // no readable reason; fall through to the body
+    }
+  }
+  die(
+    `Call failed with ${res.status}. No payment was settled.${reason}\n  ${JSON.stringify(data)}`,
+  );
 }
 
 // ------------------------------------------- step 5: proof of settlement ----

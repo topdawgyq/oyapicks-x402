@@ -28,10 +28,10 @@ cd examples/buyer
 npm install
 
 # Free: see the price and payment terms. Nothing is signed.
-node buyer.mjs single-market-algo "world cup"
+node buyer.mjs single-market-algo "bitcoin"
 
 # Paid: one cent, settled on MainNet.
-ALGO_MNEMONIC="your 25 words" node buyer.mjs single-market-algo "world cup" --pay
+ALGO_MNEMONIC="your 25 words" node buyer.mjs single-market-algo "bitcoin" --pay
 ```
 
 The paying wallet needs a little USDC (opted in to ASA `31566704`) and a little ALGO for the fee. Use a throwaway wallet with a dollar or two in it.
@@ -93,7 +93,7 @@ sequenceDiagram
     participant F as GoPlausible facilitator
     participant C as Algorand MainNet
 
-    A->>O: GET /api/x402/single-market-algo?q=world cup
+    A->>O: GET /api/x402/single-market-algo?q=bitcoin
     O-->>A: 402 + PAYMENT-REQUIRED (price, payTo, USDC ASA, tag)
     A->>A: build + sign USDC transfer (ASA 31566704)
     A->>O: GET again + PAYMENT-SIGNATURE
@@ -161,9 +161,11 @@ Things that cost us time, written down so they don't cost you any.
 
 **5. Trust the transaction, not the 200.** The buyer prints the settlement transaction ID from the `PAYMENT-RESPONSE` header so anyone can check it on-chain. An HTTP 200 alone proves nothing about whether money moved.
 
-**6. The client README and the client code disagree in two places** (`@x402-avm/*` 2.6.1):
-- The README shows `ExactAvmClient`. The actual export is `ExactAvmScheme` from `@x402-avm/avm/exact/client`. Build the signer with `toClientAvmSigner(base64Key)` from `@x402-avm/avm`.
-- The README lists an `ALGOD_MAINNET_URL` env var. The client doesn't read it. Pass `{ algodUrl }` as the second argument to `ExactAvmScheme` instead. The buyer exposes this as `ALGOD_URL`.
+**6. The AVM client builds against TestNet unless you tell it otherwise** (`@x402-avm/avm` 2.6.1). This one cost us a failed MainNet payment:
+- `ExactAvmScheme` picks its Algorand node with `algodUrl ?? DEFAULT_ALGOD_TESTNET`. Leave out `algodUrl` and it fetches TestNet transaction parameters even when the server asked for MainNet. The facilitator then rejects the payment with `Transaction genesis hash does not match expected network`.
+- Fix: always pass the node explicitly. The package exports `NETWORK_TO_ALGOD`, so `new ExactAvmScheme(signer, { algodUrl: NETWORK_TO_ALGOD[network] })` matches the node to whatever network the 402 asked for. The buyer does exactly this, and `ALGOD_URL` overrides it.
+- Also: the package README shows `ExactAvmClient`, but the actual export is `ExactAvmScheme` from `@x402-avm/avm/exact/client`. Build the signer with `toClientAvmSigner(base64Key)` from `@x402-avm/avm`.
+- If a payment is rejected, the reason arrives in the `PAYMENT-REQUIRED` header of the second 402, not in the body. The buyer prints it.
 
 **7. Alpha Arcade's API has quirks worth knowing up front.** Prices come in microunits (divide by 1,000,000). The useful 24h volume is in `twentyFourHrVolume`, while `volume` is often 0. End timestamps are in milliseconds. Markets are either binary or multi-choice with an `options[]` array. The live-markets call returns the entire catalog in one response with no pagination (967 markets when we checked).
 

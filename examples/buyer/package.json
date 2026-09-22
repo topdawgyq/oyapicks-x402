@@ -5,8 +5,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dry": "node buyer.mjs single-market-algo \"world cup\"",
-    "pay": "node buyer.mjs single-market-algo \"world cup\" --pay"
+    "dry": "node buyer.mjs single-market-algo \"bitcoin\"",
+    "pay": "node buyer.mjs single-market-algo \"bitcoin\" --pay"
   },
   "dependencies": {
     "@x402-avm/avm": "2.6.1",
