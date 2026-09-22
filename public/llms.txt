@@ -52,7 +52,7 @@ The same products are also available on Base. The Base endpoints use:
 - payTo: 0x7df9C5eDBf039b1C645d7697F58EfD143f0986E1
 
 ## MCP server
-All ten Base endpoints are also available as MCP tools for Claude Desktop, Cursor, and Windsurf.
+The endpoints are also available as MCP tools for Claude Desktop, Cursor, and Windsurf. Pay on Algorand (all eleven tools, set OYAPICKS_ALGO_MNEMONIC) or on Base (ten tools, set OYAPICKS_WALLET_PRIVATE_KEY).
 Install with: npx -y oyapicks-mcp
 - [npm](https://www.npmjs.com/package/oyapicks-mcp)
 - [source](https://github.com/oyapicks/oyapicks-mcp) — one file, MIT licensed
